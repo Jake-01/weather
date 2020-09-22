@@ -1,5 +1,8 @@
 import React from 'react';
 import './App.css';
+import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
 
 export default class App extends React.Component {
 
@@ -15,7 +18,10 @@ constructor() {
       time: 'Awaiting data',
       timeSetup: 'Awaiting data',
       lat: '',
-      long: ''
+      long: '',
+      firstLoad: 0,
+      forecastData: [],
+      forecastDate: '',
     };
     this.unsubscribe = null;
 }
@@ -27,7 +33,7 @@ componentDidMount() {
 
 
 getData(){
-  fetch(`http://192.168.10.50:4242/get_data/`).then(response => response.json())
+  fetch(`http://localhost:4242/get_data/`).then(response => response.json())
       .then((data) =>{
         var today = new Date();
         var minutes = today.getMinutes()
@@ -53,6 +59,13 @@ getData(){
             timeSetup: data[x][8]
           });
           }
+          if (this.state.firstLoad == 0 ){
+            console.log('made it this far')
+            this.getWeatherLocation(this.state.lat, this.state.long);
+            this.setState({
+              firstLoad: 1,
+            })
+          }
         setTimeout(() => {
           this.getData();
         }, 1000 )
@@ -62,8 +75,56 @@ getData(){
       })
     };
 
+getWeatherLocation(lat, long){
+  var weatherLocURL = "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=aafMn9VAtShBsZe06jiLgdAXvaxhOFS3&q=" + lat + "%2C" + long;
+  console.log(weatherLocURL)
+  fetch(weatherLocURL).then(response => response.json())
+      .then((data) =>{
+        var locationKey = data.Key;
+        console.log(data);
+        console.log(locationKey);
+        this.getWeatherForecast(locationKey);
+        this.setState({
+          location: data.LocalizedName
+        })
+        })
+      .catch(e=>{
+      console.log(e);
+      })
+    };
+
+getWeatherForecast(Key){
+  var weatherForecastURL = "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/"+Key+"?apikey=aafMn9VAtShBsZe06jiLgdAXvaxhOFS3&details=true&metric=true"
+  console.log(weatherForecastURL)
+  fetch(weatherForecastURL).then(response => response.json())
+      .then((data) =>{
+        var dateHolder = data[0].DateTime;
+        var dateHolder = dateHolder.split('+');
+        var date = dateHolder[0].replace('T', ' ')
+        this.setState({
+          forecastData: data,
+          forecastDate: date
+        })
+        console.log(data);
+        })
+      .catch(e=>{
+      console.log(e);
+      })
+    };
+
+
 componentWillUnmount() {
     this.unsubscribe();
+};
+
+reduceTime(DateTime){
+  var x = DateTime.split('T');
+  var y = x[1]
+  console.log(y)
+  var y = y.split('+');
+  var y = y[0].split(':')
+  var z = y[0]+ ':' +y[1]
+  return z;
 }
 
 
@@ -101,10 +162,10 @@ degToCard(deg){
   }else{
     return "N";
   }
-}
+};
 
 resetAverage(){
-  fetch(`http://192.168.10.50:4242/reset_average/`).then(response => response.text())
+  fetch(`http://localhost:4242/reset_average/`).then(response => response.text())
       .then((data) =>{
         console.log(data)
         })
@@ -114,7 +175,7 @@ resetAverage(){
 }
 
 resetHighestWS(){
-  fetch(`http://192.168.10.50:4242/reset_highestWS/`).then(response => response.text())
+  fetch(`http://localhost:4242/reset_highestWS/`).then(response => response.text())
       .then((data) =>{
         console.log(data)
         })
@@ -123,40 +184,74 @@ resetHighestWS(){
       })
 }
 
+openMap(){
+  var mapURL = "https://www.google.com/maps/search/?api=1&query=" + this.state.lat + ',' + this.state.long;
+  window.open(mapURL, "_blank")
+}
+
+refreshForecast(){
+  this.getWeatherLocation(this.state.lat, this.state.long);
+}
+
 render() {
   return (
     <div className="App">
-      <header className="App-header">
-        <p>
-          Current Time: {this.state.time}
-        </p>
-        <p>
-          Temp: {this.state.temp}&#8451;
-        </p>
-        <p>
-          Relative Humidity: {this.state.rh}%
-        </p>
-        <p>
-          Wind Direction: {this.state.wd} &#176;
-        </p>
-        <p>
-          Wind Speed: {this.state.ws} Km/Hr
-        </p>
-        <p>
-          Average Wind Speed: {this.state.averageWS} Km/Hr
-        </p>
-        <p>
-          Highest Gust: {this.state.HighestWS} Km/Hr
-        </p>
-        <p>
-          Time of setup: {this.state.timeSetup}
-        </p>
-        <button onClick={() => {this.resetAverage()}}>
-          Clear Average
-        </button>
-        <button onClick={() => {this.resetHighestWS()}}>
-          Clear Highest windspeed
-        </button>
+      <header className="App-header" style={{'padding-top': 20}}>
+        <Tabs>
+          <TabList>
+            <Tab>Weather</Tab>
+            <Tab>Forecast</Tab>
+          </TabList>
+
+          <TabPanel>
+            <p>
+              Current Time: {this.state.time}
+            </p>
+            <p>
+              Temp: {this.state.temp}&#8451;
+            </p>
+            <p>
+              Relative Humidity: {this.state.rh}%
+            </p>
+            <p>
+              Wind Direction: {this.state.wd} &#176;
+            </p>
+            <p>
+              Wind Speed: {this.state.ws} Km/Hr
+            </p>
+            <p>
+              Average Wind Speed: {this.state.averageWS} Km/Hr
+            </p>
+            <p>
+              Highest Gust: {this.state.HighestWS} Km/Hr
+            </p>
+            <p>
+              Time of setup: {this.state.timeSetup}
+            </p>
+            <button onClick={() => {this.resetAverage()}}>
+              Clear Average
+            </button>
+            <button onClick={() => {this.resetHighestWS()}}>
+              Clear Highest windspeed
+            </button>
+            <button onClick={() => {this.openMap()}}>
+              Google maps
+            </button>
+          </TabPanel>
+          <TabPanel>
+            <p>Weather Forecast for Lat: {this.state.lat} Long: {this.state.long}  - {this.state.location}</p>
+            <p>Period: {this.state.forecastDate} </p>
+            <div >
+              {this.state.forecastData.map((forecast, index) => (
+                <p key={index} style={{'text-align': "left"}}>Time: {this.reduceTime(forecast.DateTime)} Temp:{forecast.Temperature.Value}&#8451; Wind: {forecast.Wind.Speed.Value} Km/Hr {forecast.Wind.Direction.Localized} Gusting: {forecast.WindGust.Speed.Value} Km/Hr Rain: {forecast.Rain.Value}mm</p>
+              ))}
+            </div>
+            <button onClick={() => {this.refreshForecast()}}>
+              Update Forecast
+            </button>
+          </TabPanel>
+        </Tabs>
+
       </header>
     </div>
   );
