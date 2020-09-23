@@ -193,6 +193,10 @@ refreshForecast(){
   this.getWeatherLocation(this.state.lat, this.state.long);
 }
 
+highlight(x){
+
+}
+
 render() {
   return (
     <div className="App">
@@ -203,31 +207,39 @@ render() {
             <Tab>Forecast</Tab>
           </TabList>
 
-          <TabPanel>
-            <p>
-              Current Time: {this.state.time}
-            </p>
-            <p>
-              Temp: {this.state.temp}&#8451;
-            </p>
-            <p>
-              Relative Humidity: {this.state.rh}%
-            </p>
-            <p>
-              Wind Direction: {this.state.wd} &#176;
-            </p>
-            <p>
-              Wind Speed: {this.state.ws} Km/Hr
-            </p>
-            <p>
-              Average Wind Speed: {this.state.averageWS} Km/Hr
-            </p>
-            <p>
-              Highest Gust: {this.state.HighestWS} Km/Hr
-            </p>
-            <p>
-              Time of setup: {this.state.timeSetup}
-            </p>
+          <TabPanel style={{"min-width":"500px"}}>
+            <div className='wrapper'>
+              <div className='col-1'>Current Time: </div>
+              <div className='col-1'> {this.state.time} </div>
+            </div>
+            <div className='wrapper'>
+              <div className='col-1'>Temp: </div>
+              <div className='col-1'> {this.state.temp}&#8451; </div>
+            </div>
+            <div className='wrapper'>
+              <div className='col-1'>Relative Humidity: </div>
+              <div className='col-1'>  {this.state.rh}% </div>
+            </div>
+            <div className='wrapper'>
+              <div className='col-1'>Wind Direction: </div>
+              <div className='col-1'> {this.state.wd} &#176; </div>
+            </div>
+            <div className='wrapper'>
+              <div className='col-1'>Wind Speed: </div>
+              <div className='col-1'> {this.state.ws} Km/Hr </div>
+            </div>
+            <div className='wrapper'>
+              <div className='col-1'>Average Wind Speed: </div>
+              <div className='col-1'> {this.state.averageWS} Km/Hr </div>
+            </div>
+            <div className='wrapper'>
+              <div className='col-1'>Highest Gust: </div>
+              <div className='col-1'> {this.state.HighestWS} Km/Hr </div>
+            </div>
+            <div className='wrapper'>
+              <div className='col-1'>Time of setup: </div>
+              <div className='col-1'> {this.state.timeSetup} </div>
+            </div>
             <button onClick={() => {this.resetAverage()}}>
               Clear Average
             </button>
@@ -238,12 +250,19 @@ render() {
               Google maps
             </button>
           </TabPanel>
-          <TabPanel>
-            <p>Weather Forecast for Lat: {this.state.lat} Long: {this.state.long}  - {this.state.location}</p>
+          <TabPanel style={{"min-width":"1400px"}}>
+            <p >Weather Forecast for Lat: {this.state.lat} Long: {this.state.long}  - {this.state.location} </p>
             <p>Period: {this.state.forecastDate} </p>
             <div >
               {this.state.forecastData.map((forecast, index) => (
-                <p key={index} style={{'text-align': "left"}}>Time: {this.reduceTime(forecast.DateTime)} Temp:{forecast.Temperature.Value}&#8451; Wind: {forecast.Wind.Speed.Value} Km/Hr {forecast.Wind.Direction.Localized} Gusting: {forecast.WindGust.Speed.Value} Km/Hr Rain: {forecast.Rain.Value}mm</p>
+                <div key={index} className="wrapper" onClick={() =>{this.highlight(index)}}>
+                  <div className="col">Time: {this.reduceTime(forecast.DateTime)}</div>
+                  <div className="col">Temp: {forecast.Temperature.Value}&#8451;</div>
+                  <div className="col-2">Wind: {forecast.Wind.Speed.Value} Km/Hr {forecast.Wind.Direction.Localized}</div>
+                  <div className="col-2"> Gusting: {forecast.WindGust.Speed.Value} Km/Hr</div>
+                  <div className="col">Rain: {forecast.Rain.Value}mm</div>
+                  <div className="col">RH: {forecast.RelativeHumidity}%</div>
+                </div>
               ))}
             </div>
             <button onClick={() => {this.refreshForecast()}}>
