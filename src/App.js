@@ -19,7 +19,7 @@ constructor() {
       timeSetup: 'Awaiting data',
       lat: '',
       long: '',
-      firstLoad: 0,
+      firstLoad: true,
       forecastData: [],
       forecastDate: '',
     };
@@ -59,18 +59,30 @@ getData(){
             timeSetup: data[x][8]
           });
           }
-          if (this.state.firstLoad == 0 ){
-            console.log('made it this far')
-            this.getWeatherLocation(this.state.lat, this.state.long);
-            this.setState({
-              firstLoad: 1,
-            })
+          if (this.state.firstLoad == true ){
+            if (this.state.lat != 0 && this.state.long != 0){
+              console.log('Getting forecast')
+              this.getWeatherLocation(this.state.lat, this.state.long);
+              this.setState({
+                firstLoad: false,
+              })
+            }
+            else if (this.state.lat == 0 || this.state.long == 0){
+              console.log('No GPS data avaible')
+              this.setState({
+                forecastDate: 'GPS data unavailable - Cannot fetch weather forecast'
+              })
+            }
           }
         setTimeout(() => {
           this.getData();
         }, 1000 )
         })
       .catch(e=>{
+        this.setState({
+          err: 'An error has occured, data cannot be fetched for weather station',
+          err1: 'An error has occured, data cannot be fetched for weather station',
+        })
       console.log(e);
       })
     };
@@ -89,6 +101,9 @@ getWeatherLocation(lat, long){
         })
         })
       .catch(e=>{
+        this.setState({
+          err1: 'An error has occured, location could not be acquired from accuweather'
+        })
       console.log(e);
       })
     };
@@ -108,6 +123,9 @@ getWeatherForecast(Key){
         console.log(data);
         })
       .catch(e=>{
+        this.setState({
+          err1: 'An error has occured, forecast could not be fetched from accuweather'
+        })
       console.log(e);
       })
     };
@@ -208,6 +226,9 @@ render() {
           </TabList>
 
           <TabPanel style={{"min-width":"500px"}}>
+            <div>
+              {this.state.err}
+            </div>
             <div className='wrapper'>
               <div className='col-1'>Current Time: </div>
               <div className='col-1'> {this.state.time} </div>
@@ -251,6 +272,9 @@ render() {
             </button>
           </TabPanel>
           <TabPanel style={{"min-width":"1400px"}}>
+            <div>
+              {this.state.err1}
+            </div>
             <p >Weather Forecast for Lat: {this.state.lat} Long: {this.state.long}  - {this.state.location} </p>
             <p>Period: {this.state.forecastDate} </p>
             <div >
