@@ -31,7 +31,7 @@
 .wrapper:hover{
   background-color: white;
   color: #282c34;
-  cursor: none;
+  cursor: pointer;
 }
 
 .col{
@@ -45,4 +45,24 @@
 .col-1{
   width: 50%;
   left: 25%;
+}
+
+.button{
+  background-color: #FFF; /* Green */
+  border: none;
+  color: #282c34;
+  padding: 15px 15px;
+  margin: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.button:hover {
+  cursor: pointer;
+}
+
+.button:active{
+  padding: 18px 18px;
 }

@@ -261,13 +261,13 @@ render() {
               <div className='col-1'>Time of setup: </div>
               <div className='col-1'> {this.state.timeSetup} </div>
             </div>
-            <button onClick={() => {this.resetAverage()}}>
+            <button className="button" onClick={() => {this.resetAverage()}}>
               Clear Average
             </button>
-            <button onClick={() => {this.resetHighestWS()}}>
+            <button className="button" onClick={() => {this.resetHighestWS()}}>
               Clear Highest windspeed
             </button>
-            <button onClick={() => {this.openMap()}}>
+            <button className="button" onClick={() => {this.openMap()}}>
               Google maps
             </button>
           </TabPanel>
@@ -289,7 +289,7 @@ render() {
                 </div>
               ))}
             </div>
-            <button onClick={() => {this.refreshForecast()}}>
+            <button className="button" onClick={() => {this.refreshForecast()}}>
               Update Forecast
             </button>
           </TabPanel>
