@@ -1,6 +1,5 @@
 import React from 'react';
 import './App.css';
-import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 
@@ -33,7 +32,7 @@ componentDidMount() {
 
 
 getData(){
-  fetch(`http://localhost:4242/get_data/`).then(response => response.json())
+  fetch(`http://192.168.10.50:4242/get_data/`).then(response => response.json())
       .then((data) =>{
         var today = new Date();
         var minutes = today.getMinutes()
@@ -46,6 +45,9 @@ getData(){
           var ws = data[x][3]*3.6;
           var averageWS =  data[x][7]*3.6;
           var HighestWS =  data[x][6]*3.6;
+          ws = ws.toFixed(1);
+          averageWS = averageWS.toFixed(1);
+          HighestWS = HighestWS.toFixed(1);
           var wd = this.degToCard(data[x][2])
           this.setState({
             temp: data[x][0],
@@ -59,15 +61,15 @@ getData(){
             timeSetup: data[x][8]
           });
           }
-          if (this.state.firstLoad == true ){
-            if (this.state.lat != 0 && this.state.long != 0){
+          if (this.state.firstLoad === true ){
+            if (this.state.lat !== 0 && this.state.long !== 0){
               console.log('Getting forecast')
               this.getWeatherLocation(this.state.lat, this.state.long);
               this.setState({
                 firstLoad: false,
               })
             }
-            else if (this.state.lat == 0 || this.state.long == 0){
+            else if (this.state.lat === 0 || this.state.long === 0){
               console.log('No GPS data avaible')
               this.setState({
                 forecastDate: 'GPS data unavailable - Cannot fetch weather forecast'
@@ -114,7 +116,7 @@ getWeatherForecast(Key){
   fetch(weatherForecastURL).then(response => response.json())
       .then((data) =>{
         var dateHolder = data[0].DateTime;
-        var dateHolder = dateHolder.split('+');
+        dateHolder = dateHolder.split('+');
         var date = dateHolder[0].replace('T', ' ')
         this.setState({
           forecastData: data,
@@ -139,8 +141,8 @@ reduceTime(DateTime){
   var x = DateTime.split('T');
   var y = x[1]
   console.log(y)
-  var y = y.split('+');
-  var y = y[0].split(':')
+  y = y.split('+');
+  y = y[0].split(':')
   var z = y[0]+ ':' +y[1]
   return z;
 }
@@ -183,7 +185,7 @@ degToCard(deg){
 };
 
 resetAverage(){
-  fetch(`http://localhost:4242/reset_average/`).then(response => response.text())
+  fetch(`http://192.168.10.50:4242/reset_average/`).then(response => response.text())
       .then((data) =>{
         console.log(data)
         })
@@ -193,7 +195,7 @@ resetAverage(){
 }
 
 resetHighestWS(){
-  fetch(`http://localhost:4242/reset_highestWS/`).then(response => response.text())
+  fetch(`http://192.168.10.50:4242/reset_highestWS/`).then(response => response.text())
       .then((data) =>{
         console.log(data)
         })
@@ -218,14 +220,14 @@ highlight(x){
 render() {
   return (
     <div className="App">
-      <header className="App-header" style={{'padding-top': 20}}>
+      <header className="App-header" style={{'paddingTop': 20}}>
         <Tabs>
           <TabList>
             <Tab>Weather</Tab>
             <Tab>Forecast</Tab>
           </TabList>
 
-          <TabPanel style={{"min-width":"500px"}}>
+          <TabPanel style={{"minWidth":"500px"}}>
             <div>
               {this.state.err}
             </div>
@@ -271,7 +273,7 @@ render() {
               Google maps
             </button>
           </TabPanel>
-          <TabPanel style={{"min-width":"1400px"}}>
+          <TabPanel style={{"minWidth":"1400px"}}>
             <div>
               {this.state.err1}
             </div>

@@ -9,27 +9,27 @@ now = datetime.now()
 current_time = now.strftime("%H:%M")
 print("Current Time =", current_time)
 
-conn = sqlite3.connect(':memory:', check_same_thread=False)
+conn = sqlite3.connect('weather.db', check_same_thread=False)
 
 c = conn.cursor()
 
 HighestWS = 0
 AverageHolder = []
 
-c.execute("""CREATE TABLE variables (
-    Temp Real,
-    RH Text,
-    WD Text,
-    WS Real,
-    Lat Text,
-    Long Text,
-    HighestWS Real,
-    AverageWS Real,
-    StartTime Text
-    )""")
-
-c.execute("INSERT INTO variables VALUES (20.7, '50.0', '180', 2.0, '-45.8668', '170.4911', 0, 0, '')")
-conn.commit()
+# c.execute("""CREATE TABLE variables (
+#     Temp Real,
+#     RH Text,
+#     WD Text,
+#     WS Real,
+#     Lat Text,
+#     Long Text,
+#     HighestWS Real,
+#     AverageWS Real,
+#     StartTime Text
+#     )""")
+#
+# c.execute("INSERT INTO variables VALUES (20.7, '50.0', '180', 2.0, '-45.8668', '170.4911', 0, 0, '')")
+# conn.commit()
 
 c.execute("UPDATE variables SET StartTime = :StartTime", {'StartTime': current_time})
 conn.commit()
@@ -62,6 +62,7 @@ def get_data():
     c.execute("SELECT * FROM variables")
     data = c.fetchall()
     data = json.dumps(data)
+    conn.commit()
     return (data)
 
 @app.route("/reset_average/", methods=['GET'])
@@ -69,11 +70,13 @@ def get_data():
 def reset_average():
     global AverageHolder
     AverageHolder = []
+    now = datetime.now()
     current_time = now.strftime("%H:%M")
     c.execute("UPDATE variables SET StartTime = :StartTime", {'StartTime': current_time})
     conn.commit()
     c.execute("SELECT * FROM variables")
     print(c.fetchone())
+    print('average reset')
     return('average reset')
 
 
@@ -82,12 +85,13 @@ def reset_average():
 def reset_highestWS():
     global HighestWS
     HighestWS = 0
+    print('HighestWS reset')
     return('Highest windspeed reset')
 
 
 
 if __name__ == "__main__":
-    app.run(host='localhost', port=4242)
+    app.run(host='192.168.10.50', port=4242)
 
 
 conn.commit()
