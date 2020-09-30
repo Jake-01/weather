@@ -83,15 +83,19 @@ def timer(log_timer):
         log_timer = log_timer + 15
 
 def latConvertor(x):
-    lat = str(x)
-    lat = lat.replace('.', '')
-    lat = '-' + lat[:2] + '.' + lat[2:]
+    dec = x[3:]
+    print('dec: ' + dec)
+    dec = round(dec/60, 6)
+    lat = '-' + x[:2] + '.' + dec[2:]
+    print('lat: ' + lat)
     return lat
 
 def longConvertor(x):
-    long = str(x)
-    long = long.replace('.', '')
-    long = long[:3] + '.' + long[3:]
+    dec = x[4:]
+    print('dec: ' + dec)
+    dec = round(dec/60, 6)
+    long = '-' + x[:3] + '.' + dec[2:]
+    print('long: ' + long)
     return long
 
 while True:
