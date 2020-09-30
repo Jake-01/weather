@@ -84,7 +84,7 @@ def timer(log_timer):
 
 def latConvertor(x):
     dec = x[3:]
-    print('dec: ' + dec)
+    print('dec: ' + str(dec))
     dec = round(dec/60, 6)
     lat = '-' + x[:2] + '.' + dec[2:]
     print('lat: ' + lat)
@@ -92,7 +92,7 @@ def latConvertor(x):
 
 def longConvertor(x):
     dec = x[4:]
-    print('dec: ' + dec)
+    print('dec: ' + str(dec))
     dec = round(dec/60, 6)
     long = '-' + x[:3] + '.' + dec[2:]
     print('long: ' + long)
